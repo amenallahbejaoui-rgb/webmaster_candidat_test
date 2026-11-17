@@ -1,0 +1,326 @@
+[
+  {
+    "test": "IEEE Webmaster Candidate Test",
+    "submittedAt": "2026-11-17T12:34:17.044Z",
+    "durationMin": 3,
+    "intro": {
+      "name": "fdzga",
+      "email": "dsvbdfs@gmail.com",
+      "ieeeId": "54",
+      "study": "ddfvb",
+      "level": "Intermediate",
+      "hoursPerWeek": "0",
+      "tools": [
+        "Git / GitHub"
+      ],
+      "introduction": "dbvd",
+      "why": "dsv",
+      "portfolio": ""
+    },
+    "job": {
+      "mcqScore": 3,
+      "mcqTotal": 12,
+      "mcqDetail": [
+        {
+          "q": "What is HTML mainly used for?",
+          "chosen": "Publishing a domain",
+          "correct": false
+        },
+        {
+          "q": "What is CSS mainly used for?",
+          "chosen": "Styling and laying out a web page",
+          "correct": true
+        },
+        {
+          "q": "Which CSS rule makes an image fit within its container without stretching?",
+          "chosen": "width: 100%; height: auto;",
+          "correct": true
+        },
+        {
+          "q": "What does responsive design mean?",
+          "chosen": "The website automatically writes content",
+          "correct": false
+        },
+        {
+          "q": "What does JavaScript add to a web page?",
+          "chosen": "Interactivity and dynamic behavior",
+          "correct": true
+        },
+        {
+          "q": "Which JavaScript method selects an element by its id?",
+          "chosen": "document.selectPage()",
+          "correct": false
+        },
+        {
+          "q": "What is React commonly used for?",
+          "chosen": "Registering domain names",
+          "correct": false
+        },
+        {
+          "q": "In React, why are keys used when rendering a list?",
+          "chosen": "To add CSS colors",
+          "correct": false
+        },
+        {
+          "q": "What should you check first when a button does not work?",
+          "chosen": "The monitor brightness",
+          "correct": false
+        },
+        {
+          "q": "What is Git useful for?",
+          "chosen": "Compressing images automatically",
+          "correct": false
+        },
+        {
+          "q": "What is deployment?",
+          "chosen": "Writing a design brief",
+          "correct": false
+        },
+        {
+          "q": "What should you do before deploying an important update?",
+          "chosen": "Delete the previous version immediately",
+          "correct": false
+        }
+      ],
+      "short": [
+        {
+          "q": "Explain the difference between HTML, CSS, and JavaScript in your own words.",
+          "a": "dv"
+        },
+        {
+          "q": "A page looks good on your laptop but is broken on a phone. How would you investigate and fix it?",
+          "a": "dv"
+        },
+        {
+          "q": "Describe the steps you would follow to deploy a small website and confirm that it works.",
+          "a": "dvb"
+        }
+      ]
+    },
+    "coding": {
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>Event card</title>\n<style>\n  /* write your CSS here */\n</style>\n</head>\n<body>\n<h1></h1>\n<h2></h2>\n<button>register</button>\n<img alt=\"hey\"></img>\n  <!-- write your HTML here -->\n  <script>\n    // write your JavaScript here\n  </script>\n</body>\n</html>",
+      "explanation": "dcv",
+      "autoChecks": [
+        {
+          "name": "Has a title (h1/h2)",
+          "pass": true
+        },
+        {
+          "name": "Has a date",
+          "pass": false
+        },
+        {
+          "name": "Image with non-empty alt text",
+          "pass": true
+        },
+        {
+          "name": "Register button or link",
+          "pass": true
+        },
+        {
+          "name": "Responsive viewport meta tag",
+          "pass": true
+        },
+        {
+          "name": "Mobile styles (@media)",
+          "pass": false
+        },
+        {
+          "name": "JavaScript click action",
+          "pass": false
+        }
+      ]
+    },
+    "situations": [
+      {
+        "q": "You receive three tasks at once: fix a broken registration form, publish an event announcement, and update a team member's profile. How do you prioritize and communicate your plan?",
+        "a": "fef"
+      },
+      {
+        "q": "A committee member gives you an unclear request for a new page. What questions do you ask before starting, and how do you confirm the expected result?",
+        "a": "fe"
+      },
+      {
+        "q": "You are asked to publish content quickly, but some information is missing or has not been approved. How do you handle the request?",
+        "a": "ef"
+      },
+      {
+        "q": "You deploy an update and notice that part of the site is broken. What do you do immediately, and how do you investigate the cause?",
+        "a": "fe"
+      },
+      {
+        "q": "You cannot finish a task by the requested deadline. How do you communicate the problem, propose a solution, and keep the work moving?",
+        "a": "ef"
+      }
+    ],
+    "proctoring": {
+      "cameraEnabled": true,
+      "tabSwitches": 0,
+      "pastesInEditor": 0
+    },
+    "receivedAt": "2026-11-17T12:34:17.080Z"
+  },
+  {
+    "test": "IEEE Webmaster Candidate Test",
+    "submittedAt": "2026-11-17T12:39:22.904Z",
+    "durationMin": 1,
+    "intro": {
+      "name": "amrn",
+      "email": "maen@gmail.com",
+      "ieeeId": "",
+      "study": "data",
+      "level": "Advanced",
+      "hoursPerWeek": "9",
+      "tools": [
+        "Responsive design",
+        "Deployment / hosting"
+      ],
+      "introduction": "amen",
+      "why": "a ieee",
+      "portfolio": ""
+    },
+    "job": {
+      "mcqScore": 0,
+      "mcqTotal": 12,
+      "mcqDetail": [
+        {
+          "q": "What is HTML mainly used for?",
+          "chosen": "Styling colors and spacing",
+          "correct": false
+        },
+        {
+          "q": "What is CSS mainly used for?",
+          "chosen": "Storing user accounts",
+          "correct": false
+        },
+        {
+          "q": "Which CSS rule makes an image fit within its container without stretching?",
+          "chosen": "display: none;",
+          "correct": false
+        },
+        {
+          "q": "What does responsive design mean?",
+          "chosen": "The website only works on phones",
+          "correct": false
+        },
+        {
+          "q": "What does JavaScript add to a web page?",
+          "chosen": "Only page colors",
+          "correct": false
+        },
+        {
+          "q": "Which JavaScript method selects an element by its id?",
+          "chosen": "document.selectPage()",
+          "correct": false
+        },
+        {
+          "q": "What is React commonly used for?",
+          "chosen": "Editing photos only",
+          "correct": false
+        },
+        {
+          "q": "In React, why are keys used when rendering a list?",
+          "chosen": "To add CSS colors",
+          "correct": false
+        },
+        {
+          "q": "What should you check first when a button does not work?",
+          "chosen": "The domain price",
+          "correct": false
+        },
+        {
+          "q": "What is Git useful for?",
+          "chosen": "Compressing images automatically",
+          "correct": false
+        },
+        {
+          "q": "What is deployment?",
+          "chosen": "Writing a design brief",
+          "correct": false
+        },
+        {
+          "q": "What should you do before deploying an important update?",
+          "chosen": "Delete the previous version immediately",
+          "correct": false
+        }
+      ],
+      "short": [
+        {
+          "q": "Explain the difference between HTML, CSS, and JavaScript in your own words.",
+          "a": "css"
+        },
+        {
+          "q": "A page looks good on your laptop but is broken on a phone. How would you investigate and fix it?",
+          "a": "html"
+        },
+        {
+          "q": "Describe the steps you would follow to deploy a small website and confirm that it works.",
+          "a": "confirm"
+        }
+      ]
+    },
+    "coding": {
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>Event card</title>\n<style>\n  /* write your CSS here */\n</style>\n</head>\n<body>\n<h1>z</h1>\n  <!-- write your HTML here -->\n  <script>\n    // write your JavaScript here\n  </script>\n</body>\n</html>",
+      "explanation": "er",
+      "autoChecks": [
+        {
+          "name": "Has a title (h1/h2)",
+          "pass": true
+        },
+        {
+          "name": "Has a date",
+          "pass": false
+        },
+        {
+          "name": "Image with non-empty alt text",
+          "pass": false
+        },
+        {
+          "name": "Register button or link",
+          "pass": false
+        },
+        {
+          "name": "Responsive viewport meta tag",
+          "pass": true
+        },
+        {
+          "name": "Mobile styles (@media)",
+          "pass": false
+        },
+        {
+          "name": "JavaScript click action",
+          "pass": false
+        }
+      ]
+    },
+    "situations": [
+      {
+        "q": "You receive three tasks at once: fix a broken registration form, publish an event announcement, and update a team member's profile. How do you prioritize and communicate your plan?",
+        "a": "fb"
+      },
+      {
+        "q": "A committee member gives you an unclear request for a new page. What questions do you ask before starting, and how do you confirm the expected result?",
+        "a": "vd"
+      },
+      {
+        "q": "You are asked to publish content quickly, but some information is missing or has not been approved. How do you handle the request?",
+        "a": "a"
+      },
+      {
+        "q": "You deploy an update and notice that part of the site is broken. What do you do immediately, and how do you investigate the cause?",
+        "a": "v"
+      },
+      {
+        "q": "You cannot finish a task by the requested deadline. How do you communicate the problem, propose a solution, and keep the work moving?",
+        "a": "b"
+      }
+    ],
+    "proctoring": {
+      "cameraEnabled": true,
+      "tabSwitches": 0,
+      "pastesInEditor": 0
+    },
+    "recording": "1794919163125_amrn.webm",
+    "receivedAt": "2026-11-17T12:39:23.134Z"
+  }
+]

@@ -327,7 +327,20 @@ async function finish(auto){
   $("done").classList.remove("hide");
   let sent = false;
   if(CONFIG.submitUrl){
-    try{ await fetch(CONFIG.submitUrl, {method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain"}, body:JSON.stringify(data)}); sent = true; }catch(e){}
+    try{
+      const payload = {...data};
+      if(videoBlob){
+        const videoBuffer = await videoBlob.arrayBuffer();
+        let binary = "";
+        const bytes = new Uint8Array(videoBuffer);
+        for(let i=0;i<bytes.length;i+=0x8000) binary += String.fromCharCode(...bytes.subarray(i,i+0x8000));
+        payload.video = {mimeType:videoBlob.type, base64:btoa(binary)};
+      }
+      const response = await fetch(CONFIG.submitUrl, {
+        method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload)
+      });
+      sent = response.ok;
+    }catch(e){}
   }
   $("doneMsg").textContent = auto
     ? "Time is up and your test was submitted automatically. Thank you."

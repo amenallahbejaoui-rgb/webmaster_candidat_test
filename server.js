@@ -7,6 +7,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const ROOT = __dirname;
 const DATA_FILE = path.join(ROOT, "submissions.json");
 const QUIZ_FILE = path.join(ROOT, "webmaster-test-full.html");
+const RECORDINGS_DIR = path.join(ROOT, "recordings");
 
 if (!ADMIN_PASSWORD) {
   console.error("Set ADMIN_PASSWORD before starting the server.");
@@ -24,6 +25,10 @@ function readSubmissions() {
 
 function writeSubmissions(submissions) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(submissions, null, 2), "utf8");
+}
+
+function safeFilePart(value) {
+  return String(value || "candidate").replace(/[^\w-]+/g, "_").slice(0, 60) || "candidate";
 }
 
 function send(response, status, body, contentType) {
@@ -56,7 +61,7 @@ function rowValues(submission) {
 }
 
 function csvRow(submission) {
-  return rowValues(submission).map(csvCell).join(",");
+  return [...rowValues(submission), submission.recording || ""].map(csvCell).join(",");
 }
 
 function htmlCell(value) {
@@ -75,8 +80,16 @@ function handleSubmission(request, response) {
         send(response, 400, JSON.stringify({ok: false, error: "Invalid submission"}), "application/json");
         return;
       }
+      let recording = null;
+      if (submission.video && submission.video.base64) {
+        fs.mkdirSync(RECORDINGS_DIR, {recursive: true});
+        const filename = `${Date.now()}_${safeFilePart(submission.intro.name)}.webm`;
+        fs.writeFileSync(path.join(RECORDINGS_DIR, filename), Buffer.from(submission.video.base64, "base64"));
+        recording = filename;
+      }
+      delete submission.video;
       const submissions = readSubmissions();
-      submissions.push({...submission, receivedAt: new Date().toISOString()});
+      submissions.push({...submission, recording, receivedAt: new Date().toISOString()});
       writeSubmissions(submissions);
       send(response, 201, JSON.stringify({ok: true}), "application/json");
     } catch (error) {
@@ -95,7 +108,7 @@ function handleAdmin(request, response) {
   const headers = [
     "Submitted at", "Name", "Email", "Study / position", "Level", "Hours per week",
     "Tools", "Portfolio", "MCQ score", "MCQ total", "Short answers",
-    "Coding explanation", "Coding checks", "Situation answers", "Submitted code", "Proctoring"
+    "Coding explanation", "Coding checks", "Situation answers", "Submitted code", "Proctoring", "Recording"
   ];
   const rows = submissions.map(csvRow);
   const csv = [headers.map(csvCell).join(","), ...rows].join("\r\n");
@@ -104,7 +117,7 @@ function handleAdmin(request, response) {
 <h1>Webmaster results (${submissions.length})</h1>
 <a download="webmaster-results.csv" href="data:text/csv;charset=utf-8,${encodeURIComponent(csv)}">Download CSV</a>
 <table><thead><tr>${headers.map(header => `<th>${header}</th>`).join("")}</tr></thead><tbody>
-${submissions.map(submission => `<tr>${rowValues(submission).map(value => `<td>${htmlCell(value)}</td>`).join("")}</tr>`).join("")}
+${submissions.map(submission => `<tr>${rowValues(submission).map(value => `<td>${htmlCell(value)}</td>`).join("")}<td>${submission.recording ? `<a href="/recordings/${encodeURIComponent(submission.recording)}">Download video</a>` : "Not recorded"}</td></tr>`).join("")}
 </tbody></table>`, "text/html; charset=utf-8");
 }
 
@@ -112,6 +125,18 @@ const server = http.createServer((request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`);
   if (request.method === "POST" && url.pathname === "/api/submissions") return handleSubmission(request, response);
   if (request.method === "GET" && url.pathname === "/admin") return handleAdmin(request, response);
+  if (request.method === "GET" && url.pathname.startsWith("/recordings/")) {
+    if (!isAdmin(request)) {
+      response.writeHead(401, {"WWW-Authenticate": 'Basic realm="Webmaster results"'});
+      response.end("Admin login required");
+      return;
+    }
+    const filename = path.basename(decodeURIComponent(url.pathname.slice("/recordings/".length)));
+    const recordingPath = path.join(RECORDINGS_DIR, filename);
+    if (!fs.existsSync(recordingPath)) return send(response, 404, "Recording not found", "text/plain");
+    send(response, 200, fs.readFileSync(recordingPath), "video/webm");
+    return;
+  }
   if (request.method === "GET" && (url.pathname === "/" || url.pathname === "/webmaster-test-full.html")) {
     send(response, 200, fs.readFileSync(QUIZ_FILE), "text/html; charset=utf-8");
     return;
