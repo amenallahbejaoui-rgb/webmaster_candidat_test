@@ -1,0 +1,7 @@
+{
+  "name": "webmaster-quiz-server",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  }
+}

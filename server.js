@@ -1,7 +1,6 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
-const crypto = require("crypto");
 
 const PORT = Number(process.env.PORT || 3000);
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
@@ -43,7 +42,7 @@ function csvCell(value) {
   return `"${String(value ?? "").replace(/"/g, '""')}"`;
 }
 
-function csvRow(submission) {
+function rowValues(submission) {
   const intro = submission.intro || {};
   const job = submission.job || {};
   return [
@@ -53,7 +52,17 @@ function csvRow(submission) {
     (submission.coding || {}).explanation, JSON.stringify((submission.coding || {}).autoChecks || []),
     JSON.stringify(submission.situations || []), (submission.coding || {}).code,
     JSON.stringify(submission.proctoring || {})
-  ].map(csvCell).join(",");
+  ];
+}
+
+function csvRow(submission) {
+  return rowValues(submission).map(csvCell).join(",");
+}
+
+function htmlCell(value) {
+  return String(value ?? "").replace(/[&<>"']/g, character => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[character]));
 }
 
 function handleSubmission(request, response) {
@@ -95,7 +104,7 @@ function handleAdmin(request, response) {
 <h1>Webmaster results (${submissions.length})</h1>
 <a download="webmaster-results.csv" href="data:text/csv;charset=utf-8,${encodeURIComponent(csv)}">Download CSV</a>
 <table><thead><tr>${headers.map(header => `<th>${header}</th>`).join("")}</tr></thead><tbody>
-${submissions.map(submission => `<tr>${csvRow(submission).split(",").map(cell => `<td>${cell.replace(/^"|"$/g, "").replace(/""/g, '"')}</td>`).join("")}</tr>`).join("")}
+${submissions.map(submission => `<tr>${rowValues(submission).map(value => `<td>${htmlCell(value)}</td>`).join("")}</tr>`).join("")}
 </tbody></table>`, "text/html; charset=utf-8");
 }
 
