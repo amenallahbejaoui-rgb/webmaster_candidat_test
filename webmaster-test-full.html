@@ -194,7 +194,7 @@ const STARTER = `<!DOCTYPE html>
 const $ = id => document.getElementById(id);
 const PARTS = ["Welcome","1 Intro","2 Job","3 Coding","4 Situations"];
 let cur = 0, endAt = 0, timerId = null, submitted = false;
-const log = {tabSwitches:0, pastes:0, startedAt:null};
+const log = {tabSwitches:0, pastes:0, startedAt:null, rulesAcknowledged:false};
 
 document.title = CONFIG.title; $("ttl").textContent = CONFIG.title; $("mins").textContent = CONFIG.minutes;
 $("tools").innerHTML = TOOLS.map(t=>`<label class="chk"><input type="checkbox" value="${t}"> ${t}</label>`).join("");
@@ -216,6 +216,7 @@ runPreview();
 $("agree").onchange = () => $("start").disabled = !$("agree").checked;
 $("start").onclick = () => {
   log.startedAt = Date.now();
+  log.rulesAcknowledged = $("agree").checked;
   endAt = Date.now() + CONFIG.minutes*60000;
   timerId = setInterval(tick, 500); tick();
   show(1);
@@ -274,6 +275,7 @@ function collect(){
   const score = mcqAns.reduce((s,v,i) => s + (v === MCQ[i].a ? 1 : 0), 0);
   return {
     test: CONFIG.title, submittedAt: new Date().toISOString(),
+    rulesAcknowledged: log.rulesAcknowledged,
     durationMin: log.startedAt ? Math.round((Date.now()-log.startedAt)/60000) : 0,
     intro: {
       name:$("name").value.trim(), email:$("email").value.trim(), ieeeId:$("ieeeid").value.trim(), study:$("study").value.trim(),

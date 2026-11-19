@@ -44,74 +44,104 @@ function isAdmin(request) {
 }
 
 function csvCell(value) {
-  return `"${String(value ?? "").replace(/"/g, '""')}"`;
+  let text = String(value ?? "");
+  if (/^[=+\-@]/.test(text)) text = `'${text}`;
+  return `"${text.replace(/"/g, '""')}"`;
 }
 
-const answerAt = (submission, group, index) => {
-  const answers = group === "short"
-    ? ((submission.job || {}).short || [])
-    : (submission[group] || []);
-  return answers[index]?.a;
-};
+function buildCsvColumns(submissions) {
+  const intro = submission => (submission.intro || {});
+  const job = submission => (submission.job || {});
+  const coding = submission => (submission.coding || {});
+  const proctoring = submission => (submission.proctoring || {});
 
-const mcqAnswerAt = (submission, index) => {
-  const answer = ((submission.job || {}).mcqDetail || [])[index];
-  return answer ? answer.chosen : "";
-};
+  const columns = [
+    ["Test title", submission => submission.test],
+    ["Submitted at", submission => submission.submittedAt],
+    ["Received at", submission => submission.receivedAt],
+    ["Duration (minutes)", submission => submission.durationMin],
+    ["Automatically submitted", submission => submission.autoSubmitted ? "Yes" : "No"],
+    ["Rules acknowledged", submission => submission.rulesAcknowledged ? "Yes" : "No"],
+    ["Full name", submission => intro(submission).name],
+    ["Email", submission => intro(submission).email],
+    ["IEEE membership number", submission => intro(submission).ieeeId],
+    ["Field of study / current position", submission => intro(submission).study],
+    ["Web experience level", submission => intro(submission).level],
+    ["Tools used", submission => (intro(submission).tools || []).join(", ")],
+    ["Hours per week", submission => intro(submission).hoursPerWeek],
+    ["Self-introduction", submission => intro(submission).introduction],
+    ["Why do you want to be the IEEE webmaster?", submission => intro(submission).why],
+    ["Project or website", submission => intro(submission).portfolio],
+    ["MCQ score", submission => job(submission).mcqScore],
+    ["MCQ total", submission => job(submission).mcqTotal],
+  ];
 
-const checkResultAt = (submission, index) => {
-  const check = ((submission.coding || {}).autoChecks || [])[index];
-  return check ? (check.pass ? "Passed" : "Not passed") : "";
-};
+  const mcqCount = submissions.reduce((count, submission) =>
+    Math.max(count, ((submission.job || {}).mcqDetail || []).length), 0);
+  for (let index = 0; index < mcqCount; index++) {
+    const label = submissions.map(submission =>
+      ((submission.job || {}).mcqDetail || [])[index]?.q
+    ).find(Boolean) || `Technical question ${index + 1}`;
+    columns.push(
+      [`${label} — Selected answer`, submission =>
+        ((submission.job || {}).mcqDetail || [])[index]?.chosen || ""],
+      [`${label} — Correct`, submission =>
+        ((submission.job || {}).mcqDetail || [])[index]?.correct === true ? "Yes"
+          : ((submission.job || {}).mcqDetail || [])[index]?.correct === false ? "No" : ""]
+    );
+  }
 
-const CSV_COLUMNS = [
-  ["Test title", submission => submission.test],
-  ["Submitted at", submission => submission.submittedAt],
-  ["Duration (minutes)", submission => submission.durationMin],
-  ["Full name", submission => (submission.intro || {}).name],
-  ["Email", submission => (submission.intro || {}).email],
-  ["IEEE membership number", submission => (submission.intro || {}).ieeeId],
-  ["Field of study / current position", submission => (submission.intro || {}).study],
-  ["Web experience level", submission => (submission.intro || {}).level],
-  ["Tools used", submission => ((submission.intro || {}).tools || []).join(", ")],
-  ["Hours per week", submission => (submission.intro || {}).hoursPerWeek],
-  ["Introduction", submission => (submission.intro || {}).introduction],
-  ["Why do you want to be the IEEE webmaster?", submission => (submission.intro || {}).why],
-  ["Project or website", submission => (submission.intro || {}).portfolio],
-  ["MCQ score", submission => (submission.job || {}).mcqScore],
-  ["MCQ total", submission => (submission.job || {}).mcqTotal],
-  ["Submitted code", submission => (submission.coding || {}).code],
-  ["Coding explanation", submission => (submission.coding || {}).explanation],
-  ["Tab switches", submission => (submission.proctoring || {}).tabSwitches],
-  ["Pastes in code editor", submission => (submission.proctoring || {}).pastesInEditor],
-  ["Received at", submission => submission.receivedAt]
-];
+  const shortCount = submissions.reduce((count, submission) =>
+    Math.max(count, ((submission.job || {}).short || []).length), 0);
+  for (let index = 0; index < shortCount; index++) {
+    const label = submissions.map(submission =>
+      ((submission.job || {}).short || [])[index]?.q
+    ).find(Boolean) || `Short answer ${index + 1}`;
+    columns.push([label, submission =>
+      ((submission.job || {}).short || [])[index]?.a || ""]);
+  }
 
-CSV_COLUMNS.splice(15, 0,
-  ...Array.from({length: 12}, (_, index) => [
-    `Technical question ${index + 1}`,
-    submission => mcqAnswerAt(submission, index)
-  ]),
-  ...Array.from({length: 3}, (_, index) => [
-    `Short answer ${index + 1}`,
-    submission => answerAt(submission, "short", index)
-  ]),
-  ...Array.from({length: 7}, (_, index) => [
-    `Coding requirement ${index + 1}`,
-    submission => checkResultAt(submission, index)
-  ]),
-  ...Array.from({length: 5}, (_, index) => [
-    `Situation ${index + 1}`,
-    submission => answerAt(submission, "situations", index)
-  ])
-);
+  columns.push(
+    ["Submitted code", submission => coding(submission).code],
+    ["Coding approach / improvements", submission => coding(submission).explanation]
+  );
 
-function rowValues(submission) {
-  return CSV_COLUMNS.map(([, getValue]) => getValue(submission));
+  const checkCount = submissions.reduce((count, submission) =>
+    Math.max(count, ((submission.coding || {}).autoChecks || []).length), 0);
+  for (let index = 0; index < checkCount; index++) {
+    const label = submissions.map(submission =>
+      ((submission.coding || {}).autoChecks || [])[index]?.name
+    ).find(Boolean) || `Coding requirement ${index + 1}`;
+    columns.push([label, submission => {
+      const result = ((submission.coding || {}).autoChecks || [])[index]?.pass;
+      return result === true ? "Passed" : result === false ? "Not passed" : "";
+    }]);
+  }
+
+  const situationCount = submissions.reduce((count, submission) =>
+    Math.max(count, (submission.situations || []).length), 0);
+  for (let index = 0; index < situationCount; index++) {
+    const label = submissions.map(submission =>
+      (submission.situations || [])[index]?.q
+    ).find(Boolean) || `Situation ${index + 1}`;
+    columns.push([label, submission =>
+      (submission.situations || [])[index]?.a || ""]);
+  }
+
+  columns.push(
+    ["Tab switches", submission => proctoring(submission).tabSwitches],
+    ["Pastes in code editor", submission => proctoring(submission).pastesInEditor],
+    ["Camera enabled (legacy submissions)", submission => proctoring(submission).cameraEnabled]
+  );
+  return columns;
 }
 
-function csvRow(submission) {
-  return rowValues(submission).map(csvCell).join(",");
+function rowValues(submission, columns) {
+  return columns.map(([, getValue]) => getValue(submission));
+}
+
+function csvRow(submission, columns) {
+  return rowValues(submission, columns).map(csvCell).join(",");
 }
 
 function htmlCell(value) {
@@ -155,15 +185,16 @@ function handleAdmin(request, response) {
     return;
   }
   const submissions = readSubmissions();
-  const headers = CSV_COLUMNS.map(([header]) => header);
-  const rows = submissions.map(csvRow);
+  const csvColumns = buildCsvColumns(submissions);
+  const headers = csvColumns.map(([header]) => header);
+  const rows = submissions.map(submission => csvRow(submission, csvColumns));
   const csv = [headers.map(csvCell).join(","), ...rows].join("\r\n");
   send(response, 200, `<!doctype html><meta charset="utf-8"><title>Webmaster results</title>
 <style>body{font:16px system-ui;margin:2rem;color:#17202a}a{display:inline-block;margin-bottom:1rem;padding:.6rem 1rem;background:#00629b;color:#fff;text-decoration:none;border-radius:6px}table{border-collapse:collapse;font-size:14px}th,td{border:1px solid #ccd3db;padding:8px;text-align:left;vertical-align:top}th{background:#eef3f7}</style>
 <h1>Webmaster results (${submissions.length})</h1>
 <a download="webmaster-results.csv" href="data:text/csv;charset=utf-8,${encodeURIComponent(csv)}">Download CSV</a>
 <table><thead><tr>${headers.map(header => `<th>${header}</th>`).join("")}</tr></thead><tbody>
-${submissions.map(submission => `<tr>${rowValues(submission).map(value => `<td>${htmlCell(value)}</td>`).join("")}</tr>`).join("")}
+${submissions.map(submission => `<tr>${rowValues(submission, csvColumns).map(value => `<td>${htmlCell(value)}</td>`).join("")}</tr>`).join("")}
 </tbody></table>`, "text/html; charset=utf-8");
 }
 
