@@ -322,5 +322,171 @@
     },
     "recording": "1794919163125_amrn.webm",
     "receivedAt": "2026-11-17T12:39:23.134Z"
+  },
+  {
+    "test": "IEEE Webmaster Candidate Test",
+    "submittedAt": "2026-11-19T22:24:41.098Z",
+    "rulesAcknowledged": true,
+    "durationMin": 3,
+    "intro": {
+      "name": "hey",
+      "email": "hey@gmail.com",
+      "ieeeId": "123456",
+      "study": "software",
+      "level": "Advanced",
+      "hoursPerWeek": "5",
+      "tools": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "React",
+        "Git / GitHub"
+      ],
+      "introduction": "i'm hey 22",
+      "why": "build new experience",
+      "portfolio": "https://github.com"
+    },
+    "job": {
+      "mcqScore": 3,
+      "mcqTotal": 12,
+      "mcqDetail": [
+        {
+          "q": "What is HTML mainly used for?",
+          "chosen": "Structuring the content of a web page",
+          "correct": true
+        },
+        {
+          "q": "What is CSS mainly used for?",
+          "chosen": "Styling and laying out a web page",
+          "correct": true
+        },
+        {
+          "q": "Which CSS rule makes an image fit within its container without stretching?",
+          "chosen": "font-size: 0;",
+          "correct": false
+        },
+        {
+          "q": "What does responsive design mean?",
+          "chosen": "The website automatically writes content",
+          "correct": false
+        },
+        {
+          "q": "What does JavaScript add to a web page?",
+          "chosen": "A domain name",
+          "correct": false
+        },
+        {
+          "q": "Which JavaScript method selects an element by its id?",
+          "chosen": "document.createColor()",
+          "correct": false
+        },
+        {
+          "q": "What is React commonly used for?",
+          "chosen": "Replacing CSS completely",
+          "correct": false
+        },
+        {
+          "q": "In React, why are keys used when rendering a list?",
+          "chosen": "To add CSS colors",
+          "correct": false
+        },
+        {
+          "q": "What should you check first when a button does not work?",
+          "chosen": "The browser console and the button's event handler",
+          "correct": true
+        },
+        {
+          "q": "What is Git useful for?",
+          "chosen": "Compressing images automatically",
+          "correct": false
+        },
+        {
+          "q": "What is deployment?",
+          "chosen": "Deleting the source code",
+          "correct": false
+        },
+        {
+          "q": "What should you do before deploying an important update?",
+          "chosen": "Delete the previous version immediately",
+          "correct": false
+        }
+      ],
+      "short": [
+        {
+          "q": "Explain the difference between HTML, CSS, and JavaScript in your own words.",
+          "a": "html for\ncss for"
+        },
+        {
+          "q": "A page looks good on your laptop but is broken on a phone. How would you investigate and fix it?",
+          "a": "laptop i guess"
+        },
+        {
+          "q": "Describe the steps you would follow to deploy a small website and confirm that it works.",
+          "a": "deploy"
+        }
+      ]
+    },
+    "coding": {
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>Event card</title>\n<style>\n  /* write your CSS here */\n</style>\n</head>\n<body>\n  <!-- write your HTML here -->\n<a href=\"a\">hey</a>\n  <script>\n    // write your JavaScript here\n  </script>\n</body>\n</html>",
+      "explanation": "i explain",
+      "autoChecks": [
+        {
+          "name": "Has a title (h1/h2)",
+          "pass": false
+        },
+        {
+          "name": "Has a date",
+          "pass": false
+        },
+        {
+          "name": "Image with non-empty alt text",
+          "pass": false
+        },
+        {
+          "name": "Register button or link",
+          "pass": false
+        },
+        {
+          "name": "Responsive viewport meta tag",
+          "pass": true
+        },
+        {
+          "name": "Mobile styles (@media)",
+          "pass": false
+        },
+        {
+          "name": "JavaScript click action",
+          "pass": false
+        }
+      ]
+    },
+    "situations": [
+      {
+        "q": "You receive three tasks at once: fix a broken registration form, publish an event announcement, and update a team member's profile. How do you prioritize and communicate your plan?",
+        "a": "good i have task"
+      },
+      {
+        "q": "A committee member gives you an unclear request for a new page. What questions do you ask before starting, and how do you confirm the expected result?",
+        "a": "member request"
+      },
+      {
+        "q": "You are asked to publish content quickly, but some information is missing or has not been approved. How do you handle the request?",
+        "a": "i ask for the missing infomrations"
+      },
+      {
+        "q": "You deploy an update and notice that part of the site is broken. What do you do immediately, and how do you investigate the cause?",
+        "a": "deploy"
+      },
+      {
+        "q": "You cannot finish a task by the requested deadline. How do you communicate the problem, propose a solution, and keep the work moving?",
+        "a": "i makde deadline"
+      }
+    ],
+    "proctoring": {
+      "tabSwitches": 2,
+      "pastesInEditor": 0
+    },
+    "recording": null,
+    "receivedAt": "2026-11-19T22:24:41.137Z"
   }
 ]
