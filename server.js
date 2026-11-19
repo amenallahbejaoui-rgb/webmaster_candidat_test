@@ -47,21 +47,71 @@ function csvCell(value) {
   return `"${String(value ?? "").replace(/"/g, '""')}"`;
 }
 
+const answerAt = (submission, group, index) => {
+  const answers = group === "short"
+    ? ((submission.job || {}).short || [])
+    : (submission[group] || []);
+  return answers[index]?.a;
+};
+
+const mcqAnswerAt = (submission, index) => {
+  const answer = ((submission.job || {}).mcqDetail || [])[index];
+  return answer ? answer.chosen : "";
+};
+
+const checkResultAt = (submission, index) => {
+  const check = ((submission.coding || {}).autoChecks || [])[index];
+  return check ? (check.pass ? "Passed" : "Not passed") : "";
+};
+
+const CSV_COLUMNS = [
+  ["Test title", submission => submission.test],
+  ["Submitted at", submission => submission.submittedAt],
+  ["Duration (minutes)", submission => submission.durationMin],
+  ["Full name", submission => (submission.intro || {}).name],
+  ["Email", submission => (submission.intro || {}).email],
+  ["IEEE membership number", submission => (submission.intro || {}).ieeeId],
+  ["Field of study / current position", submission => (submission.intro || {}).study],
+  ["Web experience level", submission => (submission.intro || {}).level],
+  ["Tools used", submission => ((submission.intro || {}).tools || []).join(", ")],
+  ["Hours per week", submission => (submission.intro || {}).hoursPerWeek],
+  ["Introduction", submission => (submission.intro || {}).introduction],
+  ["Why do you want to be the IEEE webmaster?", submission => (submission.intro || {}).why],
+  ["Project or website", submission => (submission.intro || {}).portfolio],
+  ["MCQ score", submission => (submission.job || {}).mcqScore],
+  ["MCQ total", submission => (submission.job || {}).mcqTotal],
+  ["Submitted code", submission => (submission.coding || {}).code],
+  ["Coding explanation", submission => (submission.coding || {}).explanation],
+  ["Tab switches", submission => (submission.proctoring || {}).tabSwitches],
+  ["Pastes in code editor", submission => (submission.proctoring || {}).pastesInEditor],
+  ["Received at", submission => submission.receivedAt]
+];
+
+CSV_COLUMNS.splice(15, 0,
+  ...Array.from({length: 12}, (_, index) => [
+    `Technical question ${index + 1}`,
+    submission => mcqAnswerAt(submission, index)
+  ]),
+  ...Array.from({length: 3}, (_, index) => [
+    `Short answer ${index + 1}`,
+    submission => answerAt(submission, "short", index)
+  ]),
+  ...Array.from({length: 7}, (_, index) => [
+    `Coding requirement ${index + 1}`,
+    submission => checkResultAt(submission, index)
+  ]),
+  ...Array.from({length: 5}, (_, index) => [
+    `Situation ${index + 1}`,
+    submission => answerAt(submission, "situations", index)
+  ])
+);
+
 function rowValues(submission) {
-  const intro = submission.intro || {};
-  const job = submission.job || {};
-  return [
-    submission.submittedAt, intro.name, intro.email, intro.study, intro.level,
-    intro.hoursPerWeek, (intro.tools || []).join(", "), intro.portfolio,
-    job.mcqScore, job.mcqTotal, JSON.stringify(job.short || []),
-    (submission.coding || {}).explanation, JSON.stringify((submission.coding || {}).autoChecks || []),
-    JSON.stringify(submission.situations || []), (submission.coding || {}).code,
-    JSON.stringify(submission.proctoring || {})
-  ];
+  return CSV_COLUMNS.map(([, getValue]) => getValue(submission));
 }
 
 function csvRow(submission) {
-  return [...rowValues(submission), submission.recording || ""].map(csvCell).join(",");
+  return rowValues(submission).map(csvCell).join(",");
 }
 
 function htmlCell(value) {
@@ -105,11 +155,7 @@ function handleAdmin(request, response) {
     return;
   }
   const submissions = readSubmissions();
-  const headers = [
-    "Submitted at", "Name", "Email", "Study / position", "Level", "Hours per week",
-    "Tools", "Portfolio", "MCQ score", "MCQ total", "Short answers",
-    "Coding explanation", "Coding checks", "Situation answers", "Submitted code", "Proctoring", "Recording"
-  ];
+  const headers = CSV_COLUMNS.map(([header]) => header);
   const rows = submissions.map(csvRow);
   const csv = [headers.map(csvCell).join(","), ...rows].join("\r\n");
   send(response, 200, `<!doctype html><meta charset="utf-8"><title>Webmaster results</title>
@@ -117,7 +163,7 @@ function handleAdmin(request, response) {
 <h1>Webmaster results (${submissions.length})</h1>
 <a download="webmaster-results.csv" href="data:text/csv;charset=utf-8,${encodeURIComponent(csv)}">Download CSV</a>
 <table><thead><tr>${headers.map(header => `<th>${header}</th>`).join("")}</tr></thead><tbody>
-${submissions.map(submission => `<tr>${rowValues(submission).map(value => `<td>${htmlCell(value)}</td>`).join("")}<td>${submission.recording ? `<a href="/recordings/${encodeURIComponent(submission.recording)}">Download video</a>` : "Not recorded"}</td></tr>`).join("")}
+${submissions.map(submission => `<tr>${rowValues(submission).map(value => `<td>${htmlCell(value)}</td>`).join("")}</tr>`).join("")}
 </tbody></table>`, "text/html; charset=utf-8");
 }
 
