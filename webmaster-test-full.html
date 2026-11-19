@@ -41,10 +41,6 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 @media (max-width:860px){.tech{grid-template-columns:1fr}}
 #code{font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;min-height:340px;white-space:pre;tab-size:2}
 iframe{width:100%;height:300px;border:1px solid var(--bd);border-radius:10px;background:#fff}
-video{width:100%;border-radius:10px;background:#000;aspect-ratio:4/3;object-fit:cover;transform:scaleX(-1)}
-.rec{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--bad)}
-.rec i{width:10px;height:10px;border-radius:50%;background:var(--bad);animation:b 1s infinite}
-@keyframes b{50%{opacity:.2}}
 .ck li{list-style:none;margin:5px 0}.ck{padding:0;margin:10px 0}
 .ok{color:var(--ok)}.no{color:var(--mu)}
 .err{color:var(--bad);font-size:.9rem}
@@ -67,10 +63,9 @@ code{color:#8ee4ff;background:rgba(0,166,232,.09);padding:.1em .3em;border-radiu
   <p>This test has <b>4 parts</b>: (1) self-introduction, (2) technical web questions, (3) a live coding task, (4) questions about handling webmaster tasks.</p>
   <ul>
     <li>Time limit: <b id="mins"></b> minutes from the moment you press Start. The test submits automatically when time ends.</li>
-    <li>In Part 3 your <b>camera is live on screen and recorded</b> while you code. You must allow camera access.</li>
     <li>Leaving the tab, or pasting text into the code editor, is counted and shown to the committee.</li>
   </ul>
-  <label class="f"><input type="checkbox" id="agree"> I understand and agree to the rules above, including camera recording.</label>
+  <label class="f"><input type="checkbox" id="agree"> I understand and agree to the rules above.</label>
   <div class="nav"><span></span><button id="start" disabled>Start test</button></div>
 </section>
 
@@ -114,15 +109,6 @@ code{color:#8ee4ff;background:rgba(0,166,232,.09);padding:.1em .3em;border-radiu
       <iframe id="prev" sandbox="allow-scripts" title="Preview"></iframe>
     </div>
     <div>
-      <div class="card" style="margin-top:0">
-        <b>Live camera</b>
-        <div id="camwrap" class="hide"><video id="cam" autoplay muted playsinline></video><div class="rec"><i></i> Recording</div></div>
-        <div id="camoff">
-          <p class="mu">Enable your camera to unlock the editor.</p>
-          <button id="camBtn">Enable camera</button>
-          <div class="err" id="camErr"></div>
-        </div>
-      </div>
       <div class="card">
         <b>Requirements check</b>
         <ul class="ck" id="ck"></ul>
@@ -208,8 +194,8 @@ const STARTER = `<!DOCTYPE html>
 /* ============ APP ============ */
 const $ = id => document.getElementById(id);
 const PARTS = ["Welcome","1 Intro","2 Job","3 Coding","4 Situations"];
-let cur = 0, endAt = 0, timerId = null, stream = null, rec = null, chunks = [], submitted = false;
-const log = {tabSwitches:0, pastes:0, startedAt:null, camera:false};
+let cur = 0, endAt = 0, timerId = null, submitted = false;
+const log = {tabSwitches:0, pastes:0, startedAt:null};
 
 document.title = CONFIG.title; $("ttl").textContent = CONFIG.title; $("mins").textContent = CONFIG.minutes;
 $("tools").innerHTML = TOOLS.map(t=>`<label class="chk"><input type="checkbox" value="${t}"> ${t}</label>`).join("");
@@ -217,7 +203,7 @@ $("mcq").innerHTML = MCQ.map((x,i)=>`<p><b>${i+1}. ${x.q}</b></p>`+x.o.map((o,j)
 $("short").innerHTML = SHORT.map((q,i)=>`<label class="f">${q}</label><textarea data-short="${i}"></textarea>`).join("");
 $("sit").innerHTML = SITUATIONS.map((q,i)=>`<label class="f">${i+1}. ${q}</label><textarea data-sit="${i}"></textarea>`).join("");
 $("code").value = STARTER;
-$("code").disabled = true; $("run").disabled = true;
+$("code").disabled = false; $("run").disabled = false;
 
 function renderSteps(){ $("steps").innerHTML = PARTS.map((p,i)=>`<span class="${i===cur?"on":""}">${p}</span>`).join(""); }
 function show(n){
@@ -226,6 +212,7 @@ function show(n){
   renderSteps(); window.scrollTo(0,0);
 }
 renderSteps();
+runPreview();
 
 $("agree").onchange = () => $("start").disabled = !$("agree").checked;
 $("start").onclick = () => {
@@ -257,25 +244,6 @@ $("code").addEventListener("paste", () => log.pastes++);
 $("code").addEventListener("keydown", e => {
   if(e.key === "Tab"){ e.preventDefault(); const t = e.target, s = t.selectionStart; t.value = t.value.slice(0,s)+"  "+t.value.slice(t.selectionEnd); t.selectionStart = t.selectionEnd = s+2; }
 });
-
-/* Camera + recording */
-$("camBtn").onclick = async () => {
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({video:{width:640,height:480}, audio:false});
-    $("cam").srcObject = stream;
-    $("camwrap").classList.remove("hide"); $("camoff").classList.add("hide");
-    $("code").disabled = false; $("run").disabled = false; log.camera = true;
-    if(window.MediaRecorder){
-      const mt = ["video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"].find(t => MediaRecorder.isTypeSupported(t));
-      rec = new MediaRecorder(stream, mt ? {mimeType:mt} : undefined);
-      rec.ondataavailable = e => { if(e.data.size) chunks.push(e.data); };
-      rec.start(5000);
-    }
-    runPreview();
-  }catch(err){
-    $("camErr").textContent = "Camera not available: " + (err.name === "NotAllowedError" ? "permission denied. Allow the camera in your browser and try again." : err.message);
-  }
-};
 
 /* Preview + requirements check */
 const CHECKS = [
@@ -319,33 +287,19 @@ function collect(){
     },
     coding: { code:$("code").value, explanation:$("expl").value, autoChecks:checkResults() },
     situations: SITUATIONS.map((q,i)=>({q, a:document.querySelector(`[data-sit="${i}"]`).value})),
-    proctoring: { cameraEnabled:log.camera, tabSwitches:log.tabSwitches, pastesInEditor:log.pastes }
+    proctoring: { tabSwitches:log.tabSwitches, pastesInEditor:log.pastes }
   };
 }
 async function finish(auto){
   if(submitted) return; submitted = true; clearInterval(timerId);
   const data = collect();
   if(auto) data.autoSubmitted = true;
-  // stop camera + finalize recording
-  let videoBlob = null;
-  if(rec && rec.state !== "inactive"){
-    await new Promise(res => { rec.onstop = res; rec.stop(); });
-    if(chunks.length) videoBlob = new Blob(chunks, {type:"video/webm"});
-  }
-  if(stream) stream.getTracks().forEach(t => t.stop());
   for(let i=0;i<=4;i++) $("s"+i).classList.add("hide");
   $("done").classList.remove("hide");
   let sent = false;
   if(CONFIG.submitUrl){
     try{
       const payload = {...data};
-      if(videoBlob){
-        const videoBuffer = await videoBlob.arrayBuffer();
-        let binary = "";
-        const bytes = new Uint8Array(videoBuffer);
-        for(let i=0;i<bytes.length;i+=0x8000) binary += String.fromCharCode(...bytes.subarray(i,i+0x8000));
-        payload.video = {mimeType:videoBlob.type, base64:btoa(binary)};
-      }
       const response = await fetch(CONFIG.submitUrl, {
         method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload)
       });
