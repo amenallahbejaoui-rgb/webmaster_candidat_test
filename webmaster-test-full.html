@@ -103,9 +103,8 @@ code{color:#8ee4ff;background:rgba(0,166,232,.09);padding:.1em .3em;border-radiu
   <p><b>Task:</b> Build a responsive <b>event announcement card</b> for an IEEE workshop. It must include: a title, a date, an image <b>with alt text</b>, a <b>Register</b> button that shows a confirmation message when clicked (JavaScript), and a layout that works on mobile (<code>@media</code>). Use a single HTML file with embedded CSS and JS.</p>
   <div class="tech">
     <div>
-      <label class="f" style="margin-top:0">Your code <span class="mu">(Tab key indents)</span></label>
+      <label class="f" style="margin-top:0">Your code <span class="mu">(Tab key indents • live preview)</span></label>
       <textarea id="code" spellcheck="false"></textarea>
-      <div style="margin:8px 0"><button class="s" id="run">Run / refresh preview</button></div>
       <iframe id="prev" sandbox="allow-scripts" title="Preview"></iframe>
     </div>
     <div>
@@ -203,7 +202,7 @@ $("mcq").innerHTML = MCQ.map((x,i)=>`<p><b>${i+1}. ${x.q}</b></p>`+x.o.map((o,j)
 $("short").innerHTML = SHORT.map((q,i)=>`<label class="f">${q}</label><textarea data-short="${i}"></textarea>`).join("");
 $("sit").innerHTML = SITUATIONS.map((q,i)=>`<label class="f">${i+1}. ${q}</label><textarea data-sit="${i}"></textarea>`).join("");
 $("code").value = STARTER;
-$("code").disabled = false; $("run").disabled = false;
+$("code").disabled = false;
 
 function renderSteps(){ $("steps").innerHTML = PARTS.map((p,i)=>`<span class="${i===cur?"on":""}">${p}</span>`).join(""); }
 function show(n){
@@ -256,8 +255,10 @@ const CHECKS = [
   ["JavaScript click action", c => /(addEventListener\s*\(\s*["']click|onclick)/i.test(c)]
 ];
 function runPreview(){ $("prev").srcdoc = $("code").value; }
-$("run").onclick = runPreview;
-let deb; $("code").addEventListener("input", () => { clearTimeout(deb); deb = setTimeout(()=>{runPreview(); renderChecks();}, 600); });
+let deb; $("code").addEventListener("input", () => {
+  clearTimeout(deb);
+  deb = setTimeout(() => { runPreview(); renderChecks(); }, 250);
+});
 function checkResults(){ const c = $("code").value; return CHECKS.map(([n,f]) => ({name:n, pass:!!f(c)})); }
 function renderChecks(){ $("ck").innerHTML = checkResults().map(r => `<li class="${r.pass?"ok":"no"}">${r.pass?"&#10003;":"&#9675;"} ${r.name}</li>`).join(""); }
 renderChecks();
